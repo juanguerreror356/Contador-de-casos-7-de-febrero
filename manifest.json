@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Case Counter Pro",
+  "description": "Contador de casos optimizado para 200+ usuarios con sincronización en tiempo real",
+  "version": "2.4.1",
+  "author": "Juan Sebastián Guerrero Rodríguez",
+  
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  
+  "action": {
+    "default_title": "Case Counter Pro - Contador de Casos",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  
+  "host_permissions": [
+    "https://script.google.com/*",
+    "https://script.google.com/a/macros/mercadolibre.com.co/*"
+  ],
+  
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+C",
+        "mac": "Command+Shift+C"
+      },
+      "description": "Abrir Case Counter Pro"
+    }
+  },
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  
+  "minimum_chrome_version": "88"
+}

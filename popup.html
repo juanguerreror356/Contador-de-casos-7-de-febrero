@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=420, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>Case Counter Pro</title>
+  <link rel="stylesheet" href="styles.css?v=2.5.0"/>
+</head>
+<body>
+  
+  <!-- ========== TOPBAR ========== -->
+  <header class="topbar auth-only" hidden>
+    <div class="topbar-left">
+      <div class="topbar-title-wrapper">
+        <span class="topbar-title-line1">Contador de casos</span>
+        <span class="topbar-title-line2">Equipo Mature Envios</span>
+      </div>
+      <button class="icon-btn" id="focusBtn" title="Modo Foco">👁️</button>
+    </div>
+    <div class="topbar-right">
+      <time id="clock" class="clock">--:--:--</time>
+    </div>
+  </header>
+
+  <main class="root">
+
+    <!-- ========== LOGIN ========== -->
+    <section id="loginView" class="view active">
+      <div class="login-container">
+        <div class="login-logo">📊</div>
+        <h1 class="login-title">Case Counter Pro</h1>
+        <p class="login-subtitle">Gestión inteligente de casos</p>
+
+        <form id="loginForm" class="card login-card">
+          <div class="mb-16">
+            <label for="leaderLdapInput" class="label">Líder LDAP</label>
+            <input id="leaderLdapInput" class="input" type="text" placeholder="Ej: lbautista" required autocomplete="off"/>
+          </div>
+
+          <div class="mb-16">
+            <label for="ldapInput" class="label">Tu LDAP</label>
+            <input id="ldapInput" class="input" type="text" placeholder="Ej: jguerrero" required autocomplete="off"/>
+          </div>
+
+          <button type="submit" id="loginBtn" class="btn primary full">Iniciar Sesión</button>
+        </form>
+
+        <div class="credits">
+          <p>Extensión hecha por</p>
+          <p><strong>Juan Sebastián Guerrero Rodríguez</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== MAIN ========== -->
+    <section id="mainView" class="view">
+      
+      <!-- Inputs de Registro -->
+      <div class="card">
+        <label class="label" for="caseIdInput">📝 Registro de caso</label>
+        <div class="input-group">
+          <input id="caseIdInput" class="input" type="text" placeholder="ID del caso" autocomplete="off"/>
+          <input id="tmcInput" class="input" type="number" placeholder="TMC (min)" min="1" max="1440" autocomplete="off"/>
+          <button id="deleteLastBtn" class="btn-delete-inline" title="Eliminar último caso">🗑️</button>
+        </div>
+        
+        <!-- 🆕 Último Caso Visible -->
+        <div id="lastCaseInfo" class="last-case-info" style="display: none;">
+          <span class="last-case-label">Último caso:</span>
+          <span id="lastCaseText" class="last-case-text">-</span>
+        </div>
+      </div>
+
+      <!-- Botones ON/OFF -->
+      <div class="action-buttons">
+        <button id="btnOn" class="btn-action btn-on">
+          <span class="btn-action-icon">📞</span>
+          <span id="btnOnText" class="btn-action-text">ON</span>
+        </button>
+        <button id="btnOff" class="btn-action btn-off">
+          <span class="btn-action-icon">✉️</span>
+          <span id="btnOffText" class="btn-action-text">OFF</span>
+        </button>
+      </div>
+
+      <!-- Toggle Estilo Meli -->
+      <div class="card">
+        <label class="toggle-label">
+          <input type="checkbox" id="estiloMeliToggle" class="toggle-checkbox"/>
+          <span class="toggle-switch"></span>
+          <span class="toggle-label-text">⭐ Estilo Meli (Level Up)</span>
+        </label>
+      </div>
+
+      <!-- Meta Diaria con Emoji Personalizable -->
+      <div class="card meta-section">
+        <div class="meta-header">
+          <div class="meta-header-left">
+            <span class="meta-title">🎯 Meta Diaria</span>
+            <span class="meta-value" id="metaValue">50</span>
+          </div>
+          <div class="meta-header-right">
+            <button class="meta-emoji-btn" id="metaEmojiBtn" title="Cambiar emoji">🚀</button>
+            <button class="meta-edit-btn" id="metaEditBtn">Editar</button>
+          </div>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+          <div class="progress-emoji" id="progressEmoji">🚀</div>
+          <div class="progress-text" id="progressText">0/50 (0%)</div>
+        </div>
+      </div>
+
+      <!-- Estadísticas de Hoy -->
+      <div class="card">
+        <h3 class="card-title">📊 Estadísticas de Hoy</h3>
+        <div class="stats-grid">
+          <div class="stat-item stat-on">
+            <div class="stat-icon">📞</div>
+            <div class="stat-content">
+              <div class="stat-label">ON</div>
+              <div class="stat-value" id="statOn">0</div>
+            </div>
+          </div>
+          <div class="stat-item stat-off">
+            <div class="stat-icon">✉️</div>
+            <div class="stat-content">
+              <div class="stat-label">OFF</div>
+              <div class="stat-value" id="statOff">0</div>
+            </div>
+          </div>
+          <div class="stat-item stat-on-levelup">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-content">
+              <div class="stat-label">ON Level Up</div>
+              <div class="stat-value" id="statOnLevelUp">0</div>
+            </div>
+          </div>
+          <div class="stat-item stat-off-levelup">
+            <div class="stat-icon">📧</div>
+            <div class="stat-content">
+              <div class="stat-label">OFF Level Up</div>
+              <div class="stat-value" id="statOffLevelUp">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-icon">📈</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Casos</div>
+            <div class="summary-value" id="statTotal">0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">⏱️</div>
+          <div class="summary-content">
+            <div class="summary-label">TMC Promedio</div>
+            <div class="summary-value" id="statTmc">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🆕 TOP 5 RANKING EN INICIO -->
+      <div class="card">
+        <div class="top5-header">
+          <h3 class="card-title">🏆 Top 5 del Día</h3>
+          <button class="btn-link" id="viewFullRankingBtn">Ver completo →</button>
+        </div>
+        <div id="top5List" class="top5-list">
+          <p class="muted text-center">Cargando ranking...</p>
+        </div>
+      </div>
+
+      <!-- Link a Historial -->
+      <div class="card">
+        <button id="historyLink" class="btn secondary full">📜 Ver Historial Completo</button>
+      </div>
+
+    </section>
+
+    <!-- ========== RANKING ========== -->
+    <section id="rankingView" class="view">
+      <div class="view-header">
+        <h1 class="view-title">🏆 Ranking</h1>
+      </div>
+
+      <!-- Toggle Mejorado -->
+      <div class="ranking-toggle-improved">
+        <button id="rankingTeamBtn" class="ranking-btn ranking-btn-team active">
+          <span class="ranking-btn-icon">👥</span>
+          <span class="ranking-btn-text">Por Equipo</span>
+        </button>
+        <button id="rankingShiftBtn" class="ranking-btn ranking-btn-shift">
+          <span class="ranking-btn-icon">🌙</span>
+          <span class="ranking-btn-text">Por Turno</span>
+        </button>
+      </div>
+
+      <!-- Lista de Ranking -->
+      <div id="rankingList" class="ranking-list">
+        <p class="muted text-center">Cargando ranking...</p>
+      </div>
+
+      <!-- Créditos -->
+      <div class="credits">
+        <p>Extensión hecha por <strong>Juan Sebastián Guerrero Rodríguez</strong></p>
+      </div>
+    </section>
+
+    <!-- ========== HISTORY ========== -->
+    <section id="historyView" class="view">
+      <div class="history-header">
+        <h1 class="history-title">📜 Historial</h1>
+        
+        <!-- Selector de Rango de Fechas -->
+        <div class="date-range-selector">
+          <button class="date-range-btn active" data-range="today">Hoy</button>
+          <button class="date-range-btn" data-range="7">7 días</button>
+          <button class="date-range-btn" data-range="15">15 días</button>
+          <button class="date-range-btn" data-range="30">30 días</button>
+          <button class="date-range-btn" data-range="custom">Personalizado</button>
+        </div>
+
+        <!-- Rango Personalizado -->
+        <div id="customDateRange" class="custom-date-range">
+          <input type="date" id="dateFrom" class="input" placeholder="Desde"/>
+          <input type="date" id="dateTo" class="input" placeholder="Hasta"/>
+          <button id="applyCustomRange" class="btn primary">Aplicar</button>
+        </div>
+
+        <!-- Filtros por Tipo -->
+        <div class="history-filters">
+          <button class="filter-btn active" data-filter="all">Todos</button>
+          <button class="filter-btn" data-filter="ON">ON</button>
+          <button class="filter-btn" data-filter="OFF">OFF</button>
+          <button class="filter-btn" data-filter="LEVEL UP">Level Up</button>
+        </div>
+      </div>
+
+      <!-- Lista de Historial -->
+      <div id="historyList" class="history-list">
+        <p class="muted text-center">No hay casos registrados</p>
+      </div>
+
+      <!-- Créditos -->
+      <div class="credits">
+        <p>Extensión hecha por <strong>Juan Sebastián Guerrero Rodríguez</strong></p>
+      </div>
+    </section>
+
+    <!-- ========== SETTINGS ========== -->
+    <section id="settingsView" class="view">
+      <div class="view-header">
+        <h1 class="view-title">⚙️ Ajustes</h1>
+      </div>
+
+      <!-- Perfil -->
+      <div class="card">
+        <h2 class="card-title">👤 Perfil</h2>
+        <div class="profile-card">
+          <div class="profile-row">
+            <span class="profile-label">Nombre:</span>
+            <span class="profile-value" id="profileName">-</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">LDAP:</span>
+            <span class="profile-value" id="profileLdap">-</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Líder:</span>
+            <span class="profile-value" id="profileLeader">-</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-label">Turno:</span>
+            <span class="profile-value" id="profileShift">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🆕 Paletas Predefinidas -->
+      <div class="card">
+        <h2 class="card-title">🎨 Paletas de Colores</h2>
+        <div class="theme-grid">
+          <button class="theme-card" data-theme="mint">
+            <div class="theme-preview">
+              <div class="theme-color" style="background: #1DBA8E"></div>
+              <div class="theme-color" style="background: #0ea5e9"></div>
+            </div>
+            <div class="theme-name">🌿 Mint</div>
+          </button>
+          <button class="theme-card" data-theme="ocean">
+            <div class="theme-preview">
+              <div class="theme-color" style="background: #0ea5e9"></div>
+              <div class="theme-color" style="background: #06b6d4"></div>
+            </div>
+            <div class="theme-name">🌊 Ocean</div>
+          </button>
+          <button class="theme-card" data-theme="sunset">
+            <div class="theme-preview">
+              <div class="theme-color" style="background: #f59e0b"></div>
+              <div class="theme-color" style="background: #ef4444"></div>
+            </div>
+            <div class="theme-name">🌅 Sunset</div>
+          </button>
+          <button class="theme-card" data-theme="sakura">
+            <div class="theme-preview">
+              <div class="theme-color" style="background: #ec4899"></div>
+              <div class="theme-color" style="background: #a855f7"></div>
+            </div>
+            <div class="theme-name">🌸 Sakura</div>
+          </button>
+          <button class="theme-card" data-theme="midnight">
+            <div class="theme-preview">
+              <div class="theme-color" style="background: #8b5cf6"></div>
+              <div class="theme-color" style="background: #6366f1"></div>
+            </div>
+            <div class="theme-name">🌙 Midnight</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 🆕 Modo Oscuro -->
+      <div class="card">
+        <h2 class="card-title">🌓 Apariencia</h2>
+        <label class="toggle-label">
+          <input type="checkbox" id="darkModeToggle" class="toggle-checkbox" checked/>
+          <span class="toggle-switch"></span>
+          <span class="toggle-label-text">🌙 Modo Oscuro</span>
+        </label>
+      </div>
+
+      <!-- Colores Personalizados -->
+      <div class="card">
+        <h2 class="card-title">🎨 Colores Personalizados</h2>
+        <div class="color-customization-grid">
+          <div class="color-picker-group">
+            <label class="color-picker-label">Primario</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorPrimary" class="color-picker" value="#1DBA8E"/>
+              <span class="color-value" id="colorPrimaryValue">#1DBA8E</span>
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label class="color-picker-label">Secundario</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorSecondary" class="color-picker" value="#0ea5e9"/>
+              <span class="color-value" id="colorSecondaryValue">#0ea5e9</span>
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label class="color-picker-label">Fondo</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorBackground" class="color-picker" value="#0a0a0a"/>
+              <span class="color-value" id="colorBackgroundValue">#0a0a0a</span>
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label class="color-picker-label">Tarjetas</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorCard" class="color-picker" value="#111111"/>
+              <span class="color-value" id="colorCardValue">#111111</span>
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label class="color-picker-label">Texto</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorText" class="color-picker" value="#e5e5e5"/>
+              <span class="color-value" id="colorTextValue">#e5e5e5</span>
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label class="color-picker-label">Bordes</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorBorder" class="color-picker" value="#262626"/>
+              <span class="color-value" id="colorBorderValue">#262626</span>
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label class="color-picker-label">Éxito</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorSuccess" class="color-picker" value="#10b981"/>
+              <span class="color-value" id="colorSuccessValue">#10b981</span>
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label class="color-picker-label">Error</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="colorError" class="color-picker" value="#ef4444"/>
+              <span class="color-value" id="colorErrorValue">#ef4444</span>
+            </div>
+          </div>
+        </div>
+        <button id="resetColorsBtn" class="btn secondary full mt-16">Restaurar Colores por Defecto</button>
+      </div>
+
+      <!-- Avatar -->
+      <div class="card">
+        <h2 class="card-title">🎭 Avatar</h2>
+        <div class="avatar-selector" id="avatarSelector">
+          <div class="avatar-display" id="avatarDisplay">👤</div>
+          <div class="avatar-info">
+            <div class="avatar-label">Avatar Actual</div>
+            <div class="avatar-text">Click para cambiar</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sesión -->
+      <div class="card">
+        <h2 class="card-title">🚪 Sesión</h2>
+        <button id="logoutBtn" class="btn danger full">Cerrar Sesión</button>
+      </div>
+
+      <!-- Créditos -->
+      <div class="credits">
+        <p>Extensión hecha por <strong>Juan Sebastián Guerrero Rodríguez</strong></p>
+      </div>
+    </section>
+
+    <!-- ========== FOCUS ========== -->
+    <section id="focusView" class="view">
+      <div class="focus-container">
+        <h1 class="focus-title">🎯 MODO FOCO</h1>
+        
+        <div class="focus-inputs">
+          <input id="focusCaseId" class="input" type="text" placeholder="Case ID" autocomplete="off"/>
+          <input id="focusTmc" class="input" type="number" placeholder="TMC (min)" min="1" max="1440" autocomplete="off"/>
+        </div>
+
+        <div class="focus-actions">
+          <button id="focusBtnOn" class="btn-action btn-on">
+            <span class="btn-action-icon">📞</span>
+            <span class="btn-action-text">ON</span>
+          </button>
+          <button id="focusBtnOff" class="btn-action btn-off">
+            <span class="btn-action-icon">✉️</span>
+            <span class="btn-action-text">OFF</span>
+          </button>
+        </div>
+
+        <div class="focus-actions">
+          <button id="focusBtnOnLevelUp" class="btn-action btn-on">
+            <span class="btn-action-icon">🚀</span>
+            <span class="btn-action-text">ON ⭐</span>
+          </button>
+          <button id="focusBtnOffLevelUp" class="btn-action btn-off">
+            <span class="btn-action-icon">📧</span>
+            <span class="btn-action-text">OFF ⭐</span>
+          </button>
+        </div>
+
+        <div class="focus-total" id="focusTotal">0 casos</div>
+        <div class="focus-meta" id="focusMeta">Meta: 50</div>
+
+        <button id="backFromFocusBtn" class="btn secondary">Salir del Modo Foco</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAVBAR HORIZONTAL -->
+  <nav class="navbar auth-only" hidden>
+    <button class="nav-btn active" data-view="main">
+      <span class="nav-btn-icon">🏠</span>
+      <span class="nav-label">Inicio</span>
+    </button>
+    <button class="nav-btn" data-view="ranking">
+      <span class="nav-btn-icon">🏆</span>
+      <span class="nav-label">Ranking</span>
+    </button>
+    <button class="nav-btn" data-view="settings">
+      <span class="nav-btn-icon">⚙️</span>
+      <span class="nav-label">Ajustes</span>
+    </button>
+  </nav>
+
+  <!-- ========== MODALES ========== -->
+  
+  <!-- Modal Meta -->
+  <div id="metaModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">🎯 Cambiar Meta Diaria</h2>
+        <button class="modal-close" id="closeMetaModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="label">Nueva Meta (1-1000)</label>
+        <input id="metaInput" class="input" type="number" min="1" max="1000" placeholder="50"/>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" id="cancelMetaBtn">Cancelar</button>
+        <button class="btn primary" id="saveMetaBtn">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🆕 Modal Emoji de Progreso -->
+  <div id="emojiModal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2 class="modal-title">🎯 Seleccionar Emoji de Progreso</h2>
+        <button class="modal-close" id="closeEmojiModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="emojiGrid" class="emoji-grid">
+          <!-- Generado dinámicamente por JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Avatar -->
+  <div id="avatarModal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2 class="modal-title">🎭 Seleccionar Avatar</h2>
+        <button class="modal-close" id="closeAvatarModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="avatarGrid" class="avatar-grid">
+          <!-- Generado dinámicamente por JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Eliminar -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">⚠️ Eliminar Caso</h2>
+        <button class="modal-close" id="closeDeleteModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text">¿Estás seguro de eliminar este caso?</p>
+        <div id="deleteCaseInfo" class="delete-case-info">
+          <!-- Generado dinámicamente por JS -->
+        </div>
+        <p class="modal-text muted warning-text">⚠️ Esta acción no se puede deshacer</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" id="cancelDeleteBtn">Cancelar</button>
+        <button class="btn danger" id="confirmDeleteBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js?v=2.5.0"></script>
+</body>
+</html>
